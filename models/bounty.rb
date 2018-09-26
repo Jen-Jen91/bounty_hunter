@@ -8,7 +8,7 @@ class Bounty
 
 
   def initialize(options)
-    @id            = options["id"].to_i()
+    @id            = options["id"].to_i() if options["id"]
     @name          = options["name"]
     @bounty_value  = options["bounty_value"].to_i()
     @danger_level  = options["danger_level"]
@@ -36,16 +36,13 @@ class Bounty
       RETURNING id;
     "
 
-    db.prepare("save", sql)
-    result = db.exec_prepared("save", [
-      @name,
-      @bounty_value,
-      @danger_level,
-      @location
-      ])
-    db.close()
+    values = [@name, @bounty_value, @danger_level, @location]
 
-    @id = result[0]["id"].to_i()
+    db.prepare("save", sql)
+    result = db.exec_prepared("save", values)
+    @id = result[0]["id"]
+
+    db.close()
 
   end
 
@@ -61,7 +58,8 @@ class Bounty
 
     sql = "DELETE FROM bounties;"
 
-    db.exec(sql)
+    db.prepare("delete_all", sql)
+    db.exec_prepared("delete_all")
     db.close()
 
   end
@@ -122,33 +120,60 @@ class Bounty
 
 # FIND:
 
-### -------------- Got very confused here!!
 
-  # def self.find(id)
-  #
-  #   db = PG.connect({
-  #     dbname: "bounty_hunter",
-  #     host: "localhost"
-  #     })
-  #
-  #     sql = "
-  #       SELECT location FROM bounties
-  #       WHERE id = $1;
-  #     "
-  #
-  #     value = [@id]
-  #
-  #     db.prepare("find", sql)
-  #     location_hashes = db.exec_prepared("find", value)
-  #     db.close()
-  #
-  #     location_objects = location_hashes.map do |location_hash|
-  #       Bounty.new(location_hash)
-  #     end
-  #
-  #     return location_objects
-  #
-  # end
+  def self.find(id)
+
+    db = PG.connect({
+      dbname: "bounty_hunter",
+      host: "localhost"
+      })
+
+      sql = "
+        SELECT * FROM bounties
+        WHERE id = $1;
+      "
+
+      values = [id]
+
+      db.prepare("find", sql)
+      results_array = db.exec_prepared("find", values)
+      db.close()
+
+      bounty_hash = results_array[0]
+      bounty = Bounty.new(bounty_hash)
+
+      return bounty
+
+  end
+
+  #e.g. Bounty.find(17)
+
+
+  def self.find_by_name(name)
+
+    db = PG.connect({
+      dbname: "bounty_hunter",
+      host: "localhost"
+      })
+
+    sql = "SELECT * from bounties WHERE name = $1;"
+
+    values = [name]
+
+    db.prepare("find_by_name", sql)
+    results_array = db.exec_prepared("find_by_name", values)
+    db.close()
+
+    bounty_hash = results_array[0]
+    bounty = Bounty.new(bounty_hash)
+
+    return bounty
+
+  end
+
+  #e.g. Bounty.find_by_name("Spike Spiegel")
+
+
 
 
 # DELETE ONE:
@@ -160,15 +185,14 @@ class Bounty
       host: "localhost"
     })
 
-    sql = "DELETE FROM bounties WHERE name = $1;"
+    sql = "DELETE FROM bounties WHERE id = $1;"
 
-    value = [@name]
+    value = [@id]
 
     db.prepare("delete_one", sql)
     db.exec_prepared("delete_one", value)
     db.close()
 
   end
-
 
 end

@@ -23,18 +23,15 @@ bounty2 = Bounty.new({
 bounty1.save()
 bounty2.save()
 
-
-bounties = Bounty.all()
-
-
-bounty2.location = "Venus"
-bounty2.update()
-
-
-# location = Bounty.find()
-
-
-bounty1.delete_one()
+#
+# bounties = Bounty.all()
+#
+# 
+# bounty2.location = "Venus"
+# bounty2.update()
+#
+#
+# bounty1.delete_one()
 
 
 binding.pry
