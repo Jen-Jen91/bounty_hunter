@@ -2,10 +2,8 @@ require("pg")
 
 class Bounty
 
-
   attr_accessor(:name, :bounty_value, :danger_level, :location)
   attr_reader(:id)
-
 
   def initialize(options)
     @id            = options["id"].to_i() if options["id"]
@@ -15,11 +13,9 @@ class Bounty
     @location      = options["location"]
   end
 
-
 # CREATE:
 
   def save()
-
     db = PG.connect({
       dbname: "bounty_hunter",
       host: "localhost"
@@ -35,7 +31,6 @@ class Bounty
       VALUES ($1, $2, $3, $4)
       RETURNING id;
     "
-
     values = [@name, @bounty_value, @danger_level, @location]
 
     db.prepare("save", sql)
@@ -43,14 +38,11 @@ class Bounty
     @id = result[0]["id"]
 
     db.close()
-
   end
-
 
 # DELETE:
 
   def self.delete_all()
-
     db = PG.connect({
       dbname: "bounty_hunter",
       host: "localhost"
@@ -61,14 +53,11 @@ class Bounty
     db.prepare("delete_all", sql)
     db.exec_prepared("delete_all")
     db.close()
-
   end
-
 
 # READ:
 
   def self.all()
-
     db = PG.connect({
       dbname: "bounty_hunter",
       host: "localhost"
@@ -85,14 +74,11 @@ class Bounty
     end
 
     return bounty_objects
-
   end
-
 
 # UPDATE:
 
   def update()
-
     db = PG.connect({
       dbname: "bounty_hunter",
       host: "localhost"
@@ -114,43 +100,34 @@ class Bounty
     db.prepare("update", sql)
     db.exec_prepared("update", values)
     db.close()
-
   end
-
 
 # FIND:
 
-
   def self.find(id)
-
     db = PG.connect({
       dbname: "bounty_hunter",
       host: "localhost"
       })
 
-      sql = "
-        SELECT * FROM bounties
-        WHERE id = $1;
-      "
+    sql = "
+      SELECT * FROM bounties
+      WHERE id = $1;
+    "
 
-      values = [id]
+    values = [id]
 
-      db.prepare("find", sql)
-      results_array = db.exec_prepared("find", values)
-      db.close()
+    db.prepare("find", sql)
+    results_array = db.exec_prepared("find", values)
+    db.close()
 
-      bounty_hash = results_array[0]
-      bounty = Bounty.new(bounty_hash)
+    bounty_hash = results_array[0]
+    bounty = Bounty.new(bounty_hash)
 
-      return bounty
-
+    return bounty
   end
 
-  #e.g. Bounty.find(17)
-
-
   def self.find_by_name(name)
-
     db = PG.connect({
       dbname: "bounty_hunter",
       host: "localhost"
@@ -168,18 +145,11 @@ class Bounty
     bounty = Bounty.new(bounty_hash)
 
     return bounty
-
   end
-
-  #e.g. Bounty.find_by_name("Spike Spiegel")
-
-
-
 
 # DELETE ONE:
 
   def delete_one()
-
     db = PG.connect({
       dbname: "bounty_hunter",
       host: "localhost"
@@ -192,7 +162,6 @@ class Bounty
     db.prepare("delete_one", sql)
     db.exec_prepared("delete_one", value)
     db.close()
-
   end
 
 end

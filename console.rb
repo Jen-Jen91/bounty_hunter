@@ -1,9 +1,6 @@
 require_relative("./models/bounty.rb")
-require("pry")
-
 
 Bounty.delete_all()
-
 
 bounty1 = Bounty.new({
   "name" => "Spike Spiegel",
@@ -19,20 +16,5 @@ bounty2 = Bounty.new({
   "location" => "Earth"
   })
 
-
 bounty1.save()
 bounty2.save()
-
-#
-# bounties = Bounty.all()
-#
-# 
-# bounty2.location = "Venus"
-# bounty2.update()
-#
-#
-# bounty1.delete_one()
-
-
-binding.pry
-nil
